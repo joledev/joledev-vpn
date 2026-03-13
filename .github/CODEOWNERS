@@ -1,0 +1,8 @@
+# Default: owner reviews everything
+* @joledev
+
+# Critical paths: always require owner approval
+k8s/ @joledev
+.github/ @joledev
+security/ @joledev
+scripts/ @joledev

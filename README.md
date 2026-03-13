@@ -111,9 +111,15 @@ joledev-vpn/
 |-- .env.example            # Template de variables
 ```
 
+## Contributing
+
+The `main` branch is protected. All changes require a pull request with owner review before merging. See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for details.
+
+Critical paths (`k8s/`, `.github/`, `security/`, `scripts/`) are enforced via [CODEOWNERS](.github/CODEOWNERS).
+
 ## Manual completo
 
-[docs.vpn.joledev.com](https://docs.vpn.joledev.com) (requiere autenticacion)
+[docs.vpn.joledev.com](https://docs.vpn.joledev.com)
 
 ## License
 
