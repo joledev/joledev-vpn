@@ -11,6 +11,7 @@
 # Estos viven en el PVC de K3s, nunca en el repo
 wg-easy-data/
 wireguard/
+wireguard-configs/
 *.conf
 !nginx.docs.conf
 *_private.key

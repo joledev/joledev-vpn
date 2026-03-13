@@ -1,0 +1,38 @@
+name: Backup PVCs
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload backup script to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 69.62.68.130
+          username: joel
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2222
+          source: scripts/backup-pvcs.sh
+          target: ~/backup-pvcs-tmp
+          strip_components: 1
+
+      - name: Run backup script on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 69.62.68.130
+          username: joel
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2222
+          script_stop: true
+          script: |
+            chmod +x ~/backup-pvcs-tmp/backup-pvcs.sh
+            ~/backup-pvcs-tmp/backup-pvcs.sh
+            rm -rf ~/backup-pvcs-tmp
