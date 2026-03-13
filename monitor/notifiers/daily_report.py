@@ -48,8 +48,8 @@ def generate_report():
     # Fail2ban
     banned = fail2ban.get_banned_ips()
 
-    # SSH failed attempts
-    ssh_fails = run_cmd("sudo journalctl -u sshd --since '24 hours ago' 2>/dev/null | grep -c 'Failed password' || echo 0")
+    # SSH failed attempts (try auth.log first, fallback to journalctl)
+    ssh_fails = run_cmd("grep -c 'Failed password' /var/log/auth.log 2>/dev/null || sudo journalctl -u sshd --since '24 hours ago' 2>/dev/null | grep -c 'Failed password' || echo 0")
     try:
         ssh_fail_count = int(ssh_fails)
     except ValueError:

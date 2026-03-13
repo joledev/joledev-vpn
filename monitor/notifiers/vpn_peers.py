@@ -18,25 +18,45 @@ from utils.telegram import send_message
 
 STATE_FILE = "/tmp/wg_peers_state.json"
 
-# Peer name mapping (public key prefix -> friendly name)
-# This gets populated from wg-easy's config
-PEER_IP_NAMES = {
-    "10.8.0.2": "joel-android",
-    "10.8.0.3": "esposa-android",
-    "10.8.0.4": "joel-arch",
-    "10.8.0.5": "laptop-extra",
-}
-
 HANDSHAKE_TIMEOUT = 120  # 2 minutes — consider disconnected after this
 
 
+def load_wg_easy_config():
+    """Load peer names from wg-easy's wg0.json config file.
+    Returns dicts mapping public_key -> name and public_key -> address."""
+    output = run_kubectl(
+        "exec deployment/wg-easy -n joledev-vpn -- cat /etc/wireguard/wg0.json"
+    )
+    key_to_name = {}
+    key_to_address = {}
+    if not output:
+        return key_to_name, key_to_address
+    try:
+        data = json.loads(output)
+        for client in data.get("clients", {}).values():
+            pub_key = client.get("publicKey", "")
+            name = client.get("name", "")
+            address = client.get("address", "")
+            if pub_key:
+                if name:
+                    key_to_name[pub_key] = name
+                if address:
+                    key_to_address[pub_key] = address
+    except json.JSONDecodeError:
+        pass
+    return key_to_name, key_to_address
+
+
 def parse_wg_show():
-    """Parse output of wg show to get peer info."""
+    """Parse output of wg show to get peer info, enriched with wg-easy names."""
     output = run_kubectl(
         "exec deployment/wg-easy -n joledev-vpn -- wg show wg0"
     )
     if not output:
         return []
+
+    # Load friendly names from wg-easy config
+    key_to_name, key_to_address = load_wg_easy_config()
 
     peers = []
     current_peer = None
@@ -46,26 +66,25 @@ def parse_wg_show():
         if line.startswith("peer:"):
             if current_peer:
                 peers.append(current_peer)
+            pub_key = line.split("peer:")[1].strip()
             current_peer = {
-                "public_key": line.split("peer:")[1].strip(),
+                "public_key": pub_key,
                 "endpoint": None,
-                "allowed_ips": None,
+                "allowed_ips": key_to_address.get(pub_key),
                 "latest_handshake": None,
                 "transfer_rx": 0,
                 "transfer_tx": 0,
-                "name": None,
+                "name": key_to_name.get(pub_key),
             }
         elif current_peer:
             if line.startswith("endpoint:"):
                 current_peer["endpoint"] = line.split("endpoint:")[1].strip()
             elif line.startswith("allowed-ips:"):
                 ips = line.split("allowed-ips:")[1].strip()
-                # Extract the VPN IP (e.g., 10.8.0.2/32)
                 for ip in ips.split(","):
                     ip = ip.strip().split("/")[0]
                     if ip.startswith("10.8.0."):
                         current_peer["allowed_ips"] = ip
-                        current_peer["name"] = PEER_IP_NAMES.get(ip, ip)
                         break
             elif line.startswith("latest handshake:"):
                 hs_str = line.split("latest handshake:")[1].strip()
