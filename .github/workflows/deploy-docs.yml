@@ -45,5 +45,5 @@ jobs:
           port: 2222
           script_stop: true
           script: |
-            kubectl rollout restart deployment/vpn-docs -n joledev-vpn
+            kubectl set image deployment/vpn-docs nginx=ghcr.io/joledev/joledev-vpn-docs:${{ github.sha }} -n joledev-vpn
             kubectl rollout status deployment/vpn-docs -n joledev-vpn --timeout=60s
