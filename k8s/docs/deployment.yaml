@@ -15,19 +15,13 @@ spec:
       labels:
         app: vpn-docs
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: nginx
-          image: nginx:alpine
+          image: ghcr.io/joledev/joledev-vpn-docs:latest
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: html
-              mountPath: /usr/share/nginx/html
-            - name: assets
-              mountPath: /usr/share/nginx/html/assets
-            - name: nginx-conf
-              mountPath: /etc/nginx/conf.d/default.conf
-              subPath: default.conf
           resources:
             requests:
               memory: "16Mi"
@@ -35,13 +29,3 @@ spec:
             limits:
               memory: "32Mi"
               cpu: "50m"
-      volumes:
-        - name: html
-          configMap:
-            name: vpn-docs-html
-        - name: assets
-          configMap:
-            name: vpn-docs-assets
-        - name: nginx-conf
-          configMap:
-            name: vpn-docs-nginx

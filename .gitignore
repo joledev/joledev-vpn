@@ -27,6 +27,7 @@ vpn-backups/
 *.tar.gz.gpg
 
 # Archivos internos (no publicos)
+INTERNAL.md
 prompt.md
 vps-analysis-*.md
 
