@@ -27,10 +27,10 @@ Internet
           WireGuard wg0
           10.8.0.0/24
             |
-            |--- 10.8.0.2  joel-android
-            |--- 10.8.0.3  esposa-android
-            |--- 10.8.0.4  joel-arch
-            |--- 10.8.0.5  laptop-extra
+            |--- 10.8.0.2  phone-1
+            |--- 10.8.0.3  phone-2
+            |--- 10.8.0.4  desktop-1
+            |--- 10.8.0.5  laptop-1
 ```
 
 ## Stack

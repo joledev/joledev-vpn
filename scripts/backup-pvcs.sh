@@ -1,6 +1,10 @@
 #!/bin/bash
 # Backup all PVC data from K3s cluster
 # Designed to run directly on the VPS
+#
+# Edit the PVC list below to match your infrastructure.
+# Each call to backup_pvc takes: name, namespace, pod-label, container-path
+# For PostgreSQL, a pg_dump section is included as an example.
 set -euo pipefail
 
 BACKUP_ROOT="/home/joel/backups"
@@ -23,7 +27,6 @@ backup_pvc() {
   local namespace="$2"
   local label="$3"
   local container_path="$4"
-  local resource_type="${5:-deployment}"  # deployment or statefulset
 
   echo "--- $name ($namespace) ---"
 
@@ -57,44 +60,63 @@ backup_pvc() {
   echo ""
 }
 
-# --- Backup each PVC ---
+# Helper for PostgreSQL databases (uses pg_dump for consistency)
+backup_postgres() {
+  local name="$1"
+  local namespace="$2"
+  local label="$3"
+  local db_user="$4"
+  local db_name="$5"
+
+  echo "--- $name ($namespace) ---"
+
+  local pod
+  pod=$(kubectl get pod -n "$namespace" -l "$label" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+
+  if [[ -z "$pod" ]]; then
+    echo "  SKIP: no pod found"
+    FAILED+=("$name")
+    echo ""
+    return
+  fi
+
+  echo "  Pod: $pod"
+  mkdir -p "$BACKUP_DIR/$name"
+
+  if kubectl exec -n "$namespace" "$pod" -- pg_dump -U "$db_user" -d "$db_name" > "$BACKUP_DIR/$name/dump.sql" 2>/dev/null; then
+    local size
+    size=$(du -sh "$BACKUP_DIR/$name" | cut -f1)
+    echo "  OK — pg_dump ($size)"
+    BACKED_UP+=("$name ($size)")
+  else
+    echo "  FAIL: pg_dump failed, falling back to file copy"
+    rm -f "$BACKUP_DIR/$name/dump.sql"
+    if kubectl cp "$namespace/$pod:/var/lib/postgresql/data" "$BACKUP_DIR/$name" 2>/dev/null; then
+      local size
+      size=$(du -sh "$BACKUP_DIR/$name" | cut -f1)
+      echo "  OK — file copy ($size)"
+      BACKED_UP+=("$name ($size)")
+    else
+      echo "  FAIL"
+      FAILED+=("$name")
+      rm -rf "$BACKUP_DIR/$name"
+    fi
+  fi
+
+  echo ""
+}
+
+# ============================================================
+# PVC list — edit to match your infrastructure
+# Format: backup_pvc "name" "namespace" "app=label" "/mount/path"
+# ============================================================
 
 backup_pvc "wg-easy-data" "joledev-vpn" "app=wg-easy" "/etc/wireguard"
 
-backup_pvc "scheduler-data" "joledev" "app=scheduler" "/data"
-
-backup_pvc "pocketbase-data" "puntamorro" "app=pocketbase" "/pb_data"
-
-# For postgres, use pg_dump instead of raw file copy for consistency
-echo "--- recetario-db-data (puntamorro) ---"
-DB_POD=$(kubectl get pod -n puntamorro -l app=recetario-db -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
-if [[ -n "$DB_POD" ]]; then
-  echo "  Pod: $DB_POD"
-  mkdir -p "$BACKUP_DIR/recetario-db-data"
-  if kubectl exec -n puntamorro "$DB_POD" -- pg_dump -U recetario_user -d recetario > "$BACKUP_DIR/recetario-db-data/dump.sql" 2>/dev/null; then
-    SIZE=$(du -sh "$BACKUP_DIR/recetario-db-data" | cut -f1)
-    echo "  OK — pg_dump ($SIZE)"
-    BACKED_UP+=("recetario-db-data ($SIZE)")
-  else
-    echo "  FAIL: pg_dump failed, falling back to file copy"
-    rm -f "$BACKUP_DIR/recetario-db-data/dump.sql"
-    if kubectl cp "puntamorro/$DB_POD:/var/lib/postgresql/data" "$BACKUP_DIR/recetario-db-data" 2>/dev/null; then
-      SIZE=$(du -sh "$BACKUP_DIR/recetario-db-data" | cut -f1)
-      echo "  OK — file copy ($SIZE)"
-      BACKED_UP+=("recetario-db-data ($SIZE)")
-    else
-      echo "  FAIL"
-      FAILED+=("recetario-db-data")
-      rm -rf "$BACKUP_DIR/recetario-db-data"
-    fi
-  fi
-else
-  echo "  SKIP: no pod found"
-  FAILED+=("recetario-db-data")
-fi
-echo ""
-
-backup_pvc "recetario-uploads" "puntamorro" "app=recetario-backend" "/app/uploads"
+# Add your own PVCs below. Examples:
+# backup_pvc "app-data"    "my-namespace" "app=my-app"    "/data"
+# backup_pvc "uploads"     "my-namespace" "app=my-app"    "/app/uploads"
+# backup_postgres "my-db"  "my-namespace" "app=my-db"     "db_user" "db_name"
 
 # --- Compress ---
 echo "Compressing..."
@@ -112,7 +134,6 @@ if [[ -n "$EXISTING" ]]; then
     echo "  Removing: $(basename "$old")"
     rm -f "$old"
   done
-  # Also remove any leftover uncompressed directories
   ls -1dt "$BACKUP_ROOT"/20??-??-?? 2>/dev/null | tail -n +$((MAX_BACKUPS + 1)) | while read -r old; do
     rm -rf "$old"
   done
