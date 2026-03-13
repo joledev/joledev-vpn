@@ -135,6 +135,7 @@ def check_pod_issues():
                 )
                 log_text = logs[:500] if logs else "(sin logs disponibles)"
 
+                footer_cmd = f"kubectl logs {pod['name']} -n {pod['namespace']}"
                 text = (
                     f"🔴 Pod caído en K3s\n"
                     f"{header('')}\n"
@@ -143,7 +144,7 @@ def check_pod_issues():
                     f"🔄 Reinicios: {pod['restarts']}\n"
                     f"📋 Últimas líneas de log:\n"
                     f"<code>{log_text}</code>\n"
-                    f"{footer(f\"kubectl logs {pod['name']} -n {pod['namespace']}\")}"
+                    f"{footer(footer_cmd)}"
                 )
                 send_message(text)
 
