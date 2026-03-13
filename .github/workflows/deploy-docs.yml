@@ -1,0 +1,59 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'nginx.docs.conf'
+      - 'k8s/docs/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy ConfigMaps and restart
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 69.62.68.130
+          username: joel
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2222
+          script_stop: true
+          script: |
+            cd /tmp
+            rm -rf joledev-vpn-deploy
+            git clone --depth 1 https://github.com/joledev/joledev-vpn.git joledev-vpn-deploy
+            cd joledev-vpn-deploy
+
+            # Recreate HTML ConfigMap
+            kubectl create configmap vpn-docs-html \
+              --from-file=index.html=docs/index.html \
+              --from-file=android.html=docs/android.html \
+              --from-file=ios.html=docs/ios.html \
+              --from-file=linux.html=docs/linux.html \
+              --from-file=macos.html=docs/macos.html \
+              --from-file=windows.html=docs/windows.html \
+              -n joledev-vpn --dry-run=client -o yaml | kubectl apply -f -
+
+            # Recreate assets ConfigMap
+            kubectl create configmap vpn-docs-assets \
+              --from-file=style.css=docs/assets/style.css \
+              --from-file=logo.svg=docs/assets/logo.svg \
+              -n joledev-vpn --dry-run=client -o yaml | kubectl apply -f -
+
+            # Recreate nginx ConfigMap
+            kubectl create configmap vpn-docs-nginx \
+              --from-file=default.conf=nginx.docs.conf \
+              -n joledev-vpn --dry-run=client -o yaml | kubectl apply -f -
+
+            # Restart to pick up changes
+            kubectl rollout restart deployment/vpn-docs -n joledev-vpn
+            kubectl rollout status deployment/vpn-docs -n joledev-vpn --timeout=60s
+
+            # Cleanup
+            rm -rf /tmp/joledev-vpn-deploy

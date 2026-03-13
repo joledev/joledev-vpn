@@ -1,0 +1,42 @@
+# ============================================================
+# SECRETOS — NUNCA deben llegar al repo
+# ============================================================
+
+# Variables de entorno reales
+.env
+.env.local
+.env.*.local
+
+# Datos de WireGuard (llaves privadas, configs de peers)
+# Estos viven en el PVC de K3s, nunca en el repo
+wg-easy-data/
+wireguard/
+*.conf
+!nginx.docs.conf
+*_private.key
+*_public.key
+wg0.conf
+peers/
+
+# Kubeconfig
+kubeconfig
+*.kubeconfig
+
+# Backups (contienen llaves privadas)
+vpn-backups/
+*.tar.gz.gpg
+
+# Archivos internos (no publicos)
+prompt.md
+vps-analysis-*.md
+
+# ============================================================
+# Sistema
+# ============================================================
+.DS_Store
+*.log
+logs/
+*.tmp
+node_modules/
+.idea/
+.vscode/

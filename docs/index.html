@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>joledev VPN</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+      joledev VPN
+    </a>
+    <div class="nav-links">
+      <a href="android.html">Android</a>
+      <a href="ios.html">iOS</a>
+      <a href="linux.html">Linux</a>
+      <a href="macos.html">macOS</a>
+      <a href="windows.html">Windows</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>joledev VPN</h1>
+  <p class="tagline">VPN personal con WireGuard. Sin terceros, sin logs, control total. Tu trafico cifrado de punta a punta a traves de tu propio servidor.</p>
+</div>
+
+<div class="container">
+
+  <!-- Diagram -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 650 120" xmlns="http://www.w3.org/2000/svg">
+      <!-- Device -->
+      <rect x="10" y="35" width="120" height="50" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+      <text x="70" y="65" text-anchor="middle" fill="#e6edf3" font-size="13" font-family="sans-serif">Tu dispositivo</text>
+      <!-- Arrow 1 -->
+      <line x1="135" y1="60" x2="220" y2="60" stroke="#39d353" stroke-width="2" stroke-dasharray="6,3">
+        <animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <!-- Encrypted tunnel -->
+      <rect x="225" y="30" width="160" height="60" rx="8" fill="#21262d" stroke="#39d353" stroke-width="1.5"/>
+      <text x="305" y="55" text-anchor="middle" fill="#39d353" font-size="11" font-family="monospace">ChaCha20-Poly1305</text>
+      <text x="305" y="72" text-anchor="middle" fill="#8b949e" font-size="10" font-family="sans-serif">Tunel cifrado</text>
+      <!-- Arrow 2 -->
+      <line x1="390" y1="60" x2="465" y2="60" stroke="#39d353" stroke-width="2" stroke-dasharray="6,3">
+        <animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <!-- VPS -->
+      <rect x="470" y="25" width="170" height="70" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="555" y="52" text-anchor="middle" fill="#58a6ff" font-size="12" font-family="monospace">69.62.68.130</text>
+      <text x="555" y="72" text-anchor="middle" fill="#8b949e" font-size="11" font-family="sans-serif">VPS joledev</text>
+      <!-- Labels -->
+      <text x="70" y="105" text-anchor="middle" fill="#8b949e" font-size="9" font-family="sans-serif">Red publica / WiFi</text>
+      <text x="555" y="112" text-anchor="middle" fill="#8b949e" font-size="9" font-family="sans-serif">Sale a Internet con IP del VPS</text>
+    </svg>
+  </div>
+
+  <!-- Features -->
+  <div class="section">
+    <h2>Caracteristicas</h2>
+    <div class="features">
+      <div class="feature-card">
+        <h3>Cifrado ChaCha20</h3>
+        <p>WireGuard usa criptografia moderna de grado militar. Todo tu trafico es ilegible para terceros.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Sin logs de terceros</h3>
+        <p>Tu VPS, tus reglas. No hay empresa intermediaria registrando tu actividad.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Revocacion instantanea</h3>
+        <p>Si pierdes un dispositivo, revoca su acceso en segundos desde el panel admin.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Multi-dispositivo</h3>
+        <p>Conecta todos tus dispositivos simultaneamente: celular, laptop, tablet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platforms -->
+  <div class="section">
+    <h2>Guias de configuracion</h2>
+    <div class="platforms">
+      <a href="android.html" class="platform-card">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.46 11.46 0 00-8.94 0L5.65 5.67c-.19-.29-.51-.38-.83-.22-.31.16-.43.54-.26.85L6.4 9.48A10.78 10.78 0 002 18h20a10.78 10.78 0 00-4.4-8.52zM7 15.25a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm10 0a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5z"/></svg>
+        <span>Android</span>
+      </a>
+      <a href="ios.html" class="platform-card">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <span>iOS</span>
+      </a>
+      <a href="linux.html" class="platform-card">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 2c-1.8 0-3.1 1.57-3.23 3.47-.19 2.7 1 3.63 1.27 5.85.05.4-.18.53-.5.53-.3 0-.53-.12-.5-.5.15-2.1-1.06-3.03-1.57-4.35C7.44 5.6 6.5 4.5 5 4.5c-1.93 0-2.5 2-2.5 3.5 0 3.25 2.15 4.95 2.15 8 0 2.5-1.15 3-1.15 5 0 .55.45 1 1 1h15c.55 0 1-.45 1-1 0-2-1.15-2.5-1.15-5 0-3.05 2.15-4.75 2.15-8 0-1.5-.57-3.5-2.5-3.5-1.5 0-2.44 1.1-2.97 2.5-.51 1.32-1.72 2.25-1.57 4.35.03.38-.2.5-.5.5-.32 0-.55-.13-.5-.53.27-2.22 1.46-3.15 1.27-5.85C14.6 3.57 13.3 2 12.5 2z"/></svg>
+        <span>Linux</span>
+      </a>
+      <a href="macos.html" class="platform-card">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm4 18h8m-4-4v4"/><line x1="2" y1="16" x2="22" y2="16" stroke="currentColor" stroke-width="0.5"/></svg>
+        <span>macOS</span>
+      </a>
+      <a href="windows.html" class="platform-card">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 12V6.5l8-1.14V12H3zm0 .5h8v6.64l-8-1.14V12.5zm9-7.03L21 4v8.5h-9V5.47zm0 13.06V12.5h9V20l-9-1.47z"/></svg>
+        <span>Windows</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section">
+    <h2>Como funciona</h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="number">1</div>
+        <h3>El admin crea tu peer</h3>
+        <p>Desde el panel, se genera un par de llaves unico para tu dispositivo y se te asigna una IP interna (ej. 10.8.0.2).</p>
+      </div>
+      <div class="how-card">
+        <div class="number">2</div>
+        <h3>Escaneas el QR o importas el .conf</h3>
+        <p>La app de WireGuard en tu dispositivo recibe la configuracion con un QR o archivo. Cero configuracion manual.</p>
+      </div>
+      <div class="how-card">
+        <div class="number">3</div>
+        <h3>Tu trafico viaja cifrado</h3>
+        <p>Todo tu trafico pasa por un tunel cifrado con ChaCha20-Poly1305 hasta el VPS en 69.62.68.130. Nadie en tu red local puede verlo.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>joledev VPN &mdash; <a href="https://github.com/joledev/joledev-vpn" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const code = btn.parentElement.querySelector('pre').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

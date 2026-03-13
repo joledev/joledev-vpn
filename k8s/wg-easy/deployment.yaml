@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wg-easy
+  namespace: joledev-vpn
+  labels:
+    app: wg-easy
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wg-easy
+  template:
+    metadata:
+      labels:
+        app: wg-easy
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: wg-easy
+          image: ghcr.io/wg-easy/wg-easy:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+          env:
+            - name: LANG
+              value: "es"
+            - name: WG_HOST
+              value: "69.62.68.130"
+            - name: WG_PORT
+              value: "51820"
+            - name: WG_DEFAULT_ADDRESS
+              value: "10.8.0.x"
+            - name: WG_DEFAULT_DNS
+              value: "1.1.1.1,1.0.0.1"
+            - name: WG_ALLOWED_IPS
+              value: "0.0.0.0/0"
+            - name: WG_PERSISTENT_KEEPALIVE
+              value: "25"
+            - name: UI_TRAFFIC_STATS
+              value: "true"
+            - name: UI_CHART_TYPE
+              value: "1"
+            - name: WG_POST_UP
+              value: "iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE"
+            - name: WG_POST_DOWN
+              value: "iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE"
+            - name: PASSWORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: wg-easy-secret
+                  key: password-hash
+          ports:
+            - containerPort: 51820
+              protocol: UDP
+              name: wireguard
+            - containerPort: 51821
+              protocol: TCP
+              name: web-ui
+          volumeMounts:
+            - name: wg-data
+              mountPath: /etc/wireguard
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+      volumes:
+        - name: wg-data
+          persistentVolumeClaim:
+            claimName: wg-easy-data
+      nodeSelector:
+        kubernetes.io/hostname: srv908005

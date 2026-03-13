@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android - joledev VPN</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+      joledev VPN
+    </a>
+    <div class="nav-links">
+      <a href="android.html" class="active">Android</a>
+      <a href="ios.html">iOS</a>
+      <a href="linux.html">Linux</a>
+      <a href="macos.html">macOS</a>
+      <a href="windows.html">Windows</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb">
+    <a href="/">Inicio</a> &rsaquo; Android
+  </div>
+
+  <h1>Configurar WireGuard en Android</h1>
+
+  <div class="steps">
+    <div class="step">
+      <h3>Instalar WireGuard</h3>
+      <p>Descarga <strong>WireGuard</strong> desde Google Play Store. Es la app oficial, gratuita, sin publicidad.</p>
+      <div class="screenshot">[ Captura: Google Play Store mostrando la app WireGuard de Jason A. Donenfeld ]</div>
+    </div>
+
+    <div class="step">
+      <h3>Obtener tu configuracion</h3>
+      <p>El administrador te proporcionara un codigo QR desde el panel de admin. Si no lo tienes, solicitalo.</p>
+    </div>
+
+    <div class="step">
+      <h3>Escanear el QR</h3>
+      <p>Abre WireGuard, toca el boton <strong>+</strong> (agregar tunel), selecciona <strong>"Escanear desde codigo QR"</strong> y apunta la camara al QR.</p>
+      <div class="screenshot">[ Captura: App WireGuard con boton + y opcion "Escanear desde codigo QR" ]</div>
+    </div>
+
+    <div class="step">
+      <h3>Nombrar el tunel</h3>
+      <p>Ponle un nombre descriptivo, por ejemplo: <code>joledev-vpn</code>.</p>
+    </div>
+
+    <div class="step">
+      <h3>Conectar</h3>
+      <p>Toca el interruptor junto al tunel que acabas de crear. Veras un icono de llave en la barra de estado cuando estes conectado.</p>
+      <div class="screenshot">[ Captura: Tunel activo con estadisticas de transferencia ]</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Verificar que funciona</h2>
+    <p>Con el VPN activado, abre el navegador y ve a:</p>
+    <div class="code-block">
+      <button class="copy-btn">Copiar</button>
+      <pre>https://whatismyip.com</pre>
+    </div>
+    <p>La IP mostrada debe ser <code>69.62.68.130</code> (la IP del VPS). Si ves tu IP real, algo no esta bien configurado.</p>
+  </div>
+
+  <div class="section">
+    <h2>Solucion de problemas</h2>
+
+    <div class="callout warning">
+      <strong>No se conecta / timeout</strong>
+      Verifica que estas en una red con acceso a Internet. Algunas redes WiFi publicas bloquean UDP. Intenta con datos moviles.
+    </div>
+
+    <div class="callout warning">
+      <strong>Conectado pero sin Internet</strong>
+      Desconecta y reconecta el tunel. Si persiste, verifica que el DNS este configurado (1.1.1.1) en los ajustes del tunel.
+    </div>
+
+    <div class="callout warning">
+      <strong>Paginas cargan lento</strong>
+      Puede ser un problema de MTU. Edita el tunel, ve a ajustes avanzados y cambia el MTU a <code>1420</code>.
+    </div>
+
+    <div class="callout warning">
+      <strong>Se desconecta solo</strong>
+      Android puede matar la app en segundo plano. Ve a Ajustes &gt; Apps &gt; WireGuard &gt; Bateria y selecciona "Sin restricciones".
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Nota de seguridad</h2>
+    <div class="callout">
+      <strong>Que protege este VPN</strong>
+      Cifra todo tu trafico entre tu telefono y el VPS. Nadie en tu red WiFi (cafeteria, hotel, aeropuerto) puede ver lo que haces.
+    </div>
+    <div class="callout danger">
+      <strong>Que NO protege</strong>
+      No te hace anonimo. El VPS tiene una IP fija conocida. No protege contra malware en tu dispositivo ni contra sitios web que recopilan datos directamente (cookies, fingerprinting).
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>joledev VPN &mdash; <a href="https://github.com/joledev/joledev-vpn" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const code = btn.parentElement.querySelector('pre').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

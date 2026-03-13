@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vpn-docs-tls
+  namespace: joledev-vpn
+spec:
+  secretName: vpn-docs-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - docs.vpn.joledev.com

@@ -1,0 +1,50 @@
+name: Update wg-easy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull latest image and rollout restart
+        uses: appleboy/ssh-action@v1
+        id: deploy
+        with:
+          host: 69.62.68.130
+          username: joel
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2222
+          script_stop: true
+          script: |
+            # Get current image digest before update
+            OLD_DIGEST=$(kubectl get deployment wg-easy -n joledev-vpn \
+              -o jsonpath='{.spec.template.spec.containers[0].image}')
+            echo "Current image: $OLD_DIGEST"
+
+            # Pull latest image
+            sudo k3s crictl pull ghcr.io/wg-easy/wg-easy:latest
+
+            # Get new digest
+            NEW_DIGEST=$(sudo k3s crictl inspecti ghcr.io/wg-easy/wg-easy:latest 2>/dev/null \
+              | grep -o '"digest":"sha256:[a-f0-9]*"' | head -1 | cut -d'"' -f4)
+            echo "New digest: $NEW_DIGEST"
+
+            # Rollout restart
+            kubectl rollout restart deployment/wg-easy -n joledev-vpn
+            kubectl rollout status deployment/wg-easy -n joledev-vpn --timeout=120s
+
+            echo "wg-easy updated successfully"
+            echo "NEW_DIGEST=$NEW_DIGEST" >> /tmp/wg-easy-update-result
+
+      - name: Commit version update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+          git commit --allow-empty -m "chore: wg-easy updated to latest ($TIMESTAMP)"
+          git push

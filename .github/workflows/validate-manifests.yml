@@ -1,0 +1,55 @@
+name: Validate Manifests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'k8s/**'
+  pull_request:
+    paths:
+      - 'k8s/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate K8s manifests via dry-run
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 69.62.68.130
+          username: joel
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2222
+          script_stop: true
+          script: |
+            echo "=== Validating k8s manifests ==="
+            cd /tmp
+            rm -rf joledev-vpn-validate
+            git clone --depth 1 --branch ${{ github.head_ref || github.ref_name }} \
+              https://github.com/joledev/joledev-vpn.git joledev-vpn-validate
+            cd joledev-vpn-validate
+
+            FAILED=0
+            for f in k8s/namespace.yaml k8s/wg-easy/*.yaml k8s/docs/*.yaml; do
+              if [ -f "$f" ]; then
+                echo "Validating $f..."
+                if kubectl apply --dry-run=client -f "$f" 2>&1; then
+                  echo "  OK"
+                else
+                  echo "  FAILED"
+                  FAILED=1
+                fi
+              fi
+            done
+
+            rm -rf /tmp/joledev-vpn-validate
+
+            if [ $FAILED -eq 1 ]; then
+              echo "Some manifests failed validation"
+              exit 1
+            fi
+            echo "=== All manifests valid ==="

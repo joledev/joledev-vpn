@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vpn-docs-ingress
+  namespace: joledev-vpn
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: openfaas-authelia@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: docs.vpn.joledev.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vpn-docs
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - docs.vpn.joledev.com
+      secretName: vpn-docs-tls

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wg-easy-ingress
+  namespace: joledev-vpn
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: openfaas-authelia@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: admin.vpn.joledev.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wg-easy
+                port:
+                  number: 51821
+  tls:
+    - hosts:
+        - admin.vpn.joledev.com
+      secretName: wg-easy-tls

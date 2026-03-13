@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpn-docs
+  namespace: joledev-vpn
+  labels:
+    app: vpn-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpn-docs
+  template:
+    metadata:
+      labels:
+        app: vpn-docs
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: assets
+              mountPath: /usr/share/nginx/html/assets
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+            limits:
+              memory: "32Mi"
+              cpu: "50m"
+      volumes:
+        - name: html
+          configMap:
+            name: vpn-docs-html
+        - name: assets
+          configMap:
+            name: vpn-docs-assets
+        - name: nginx-conf
+          configMap:
+            name: vpn-docs-nginx
