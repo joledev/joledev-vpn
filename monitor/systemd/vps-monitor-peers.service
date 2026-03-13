@@ -1,0 +1,10 @@
+[Unit]
+Description=Check WireGuard peers status
+After=network.target k3s.service
+
+[Service]
+Type=oneshot
+User=joel
+WorkingDirectory=/home/joel/vps-monitor
+EnvironmentFile=/home/joel/vps-monitor/.env
+ExecStart=/usr/bin/python3 /home/joel/vps-monitor/notifiers/vpn_peers.py

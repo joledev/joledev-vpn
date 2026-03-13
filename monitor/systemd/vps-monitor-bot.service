@@ -1,0 +1,18 @@
+[Unit]
+Description=VPS Monitor Telegram Bot
+After=network.target k3s.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=joel
+WorkingDirectory=/home/joel/vps-monitor
+EnvironmentFile=/home/joel/vps-monitor/.env
+ExecStart=/usr/bin/python3 /home/joel/vps-monitor/bot.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
